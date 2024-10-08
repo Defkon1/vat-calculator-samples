@@ -1,0 +1,97 @@
+﻿@page "/vat"
+<PageTitle>Calcolo IVA</PageTitle>
+
+<EditForm Model="@_formModel">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="grossAmount">Importo lordo:</label>
+        <InputNumber id="grossAmount"
+                     class="form-control"
+                     @bind-Value="_formModel.GrossAmount"
+                     @bind-Value:after="UpdateNetAmount" />
+    </div>
+    <div class="form-group">
+        <label for="vatPercentage">Percentuale IVA:</label>
+        <select id="vatPercentage"
+                class="form-control"
+                @onchange="OnSelectChange">
+            <option value="4">4</option>
+            <option value="10">10</option>
+            <option value="22" selected="selected">22</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="netAmount">Importo netto:</label>
+        <InputNumber id="netAmount"
+                     class="form-control" 
+                     @bind-Value="_formModel.NetAmount"
+                     @bind-Value:after="UpdateGrossAmount" />
+    </div>
+    <div class="form-group">
+        <label for="vat">IVA:</label>
+        <InputNumber id="vat"
+                     class="form-control disabled"
+                     @bind-Value="_formModel.VatAmount" 
+                     readonly />
+    </div>
+</EditForm>
+
+@code {
+    private FormModel _formModel = new FormModel();
+
+    private void UpdateNetAmount()
+    {
+        var netAmount = _formModel.GrossAmount / (1 + (_formModel.VatPercentage / 100.0m));
+        var vatAmount = _formModel.GrossAmount - netAmount;
+
+        _formModel.NetAmount = Math.Round(netAmount ?? 0, 2);
+        _formModel.VatAmount = Math.Round(vatAmount ?? 0, 2);
+
+    }
+
+    private void UpdateGrossAmount()
+    {
+        var grossAmount = _formModel.NetAmount * (1 + (_formModel.VatPercentage / 100.0m));
+        var vatAmount = grossAmount - _formModel.NetAmount;
+
+        _formModel.GrossAmount = Math.Round(grossAmount ?? 0, 2);
+        _formModel.VatAmount = Math.Round(vatAmount ?? 0, 2);
+    }
+
+    private void OnSelectChange(ChangeEventArgs e)
+    {
+        if (decimal.TryParse(e.Value?.ToString(), out decimal selectedValue))
+        {
+            _formModel.VatPercentage = selectedValue;
+
+            UpdateGrossAmount();
+        }
+
+        // Log the change
+        Console.WriteLine($"Input 2 changed to: {e.Value}");
+    }
+
+    public class FormModel
+    {
+        private decimal? _grossAmount = 0.00m;
+        private decimal? _netAmount = 0.00m;
+
+        public decimal? GrossAmount
+        {
+            get => _grossAmount;
+            set => _grossAmount = value < 0.00m ? 0.00m : value;
+        }
+
+        public decimal? VatPercentage { get; set; } = 22m;
+
+        public decimal? NetAmount
+        {
+            get => _netAmount;
+            set => _netAmount = value < 0.00m ? 0.00m : value;
+        }
+
+        public decimal? VatAmount { get; set; }
+    }
+}
