@@ -10,13 +10,13 @@ Check /docs/user-stories to view the main requirements.
 
 ## Roadmap
 
-[ ] Blazor server
-[x] Blazor WASM
-[ ] .NET MAUI Blazor
-[ ] UNO Platform
-[ ] Dart/Flutter
-[ ] Java
-[ ] PHP
+- [ ] Blazor server
+- [x] Blazor WASM
+- [ ] .NET MAUI Blazor
+- [ ] UNO Platform
+- [ ] Dart/Flutter
+- [ ] Java
+- [ ] PHP
 
 ## Contributing
 
